@@ -84,7 +84,7 @@ void task_ssd1306_display_pattern(void *ignore)
 		i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_SINGLE, true);
 		i2c_master_write_byte(cmd, 0xB0 | i, true);
 		i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_DATA_STREAM, true);
-		for (uint8_t j = 0; j < 128; j++)
+		for (uint8_t j = 0; j < OLED_CONFIG_PIXEL_H; j++)
 		{
 			i2c_master_write_byte(cmd, 0xFF >> (j % 8), true);
 		}
@@ -96,25 +96,101 @@ void task_ssd1306_display_pattern(void *ignore)
 	vTaskDelete(NULL);
 }
 
-void task_ssd1306_display_clear(void *ignore)
+uint8_t extract(uint8_t input, bool up)
+{
+	bool dn = !up;
+	uint8_t output = 0;
+
+	if (up)
+	{
+		if (input & 0b00010000)
+		{
+			output |= 0b00000010;
+		}
+		if (input & 0b00100000)
+		{
+			output |= 0b00001000;
+		}
+		if (input & 0b01000000)
+		{
+			output |= 0b00100000;
+		}
+		if (input & 0b10000000)
+		{
+			output |= 0b10000000;
+		}
+	}
+	if (dn)
+	{
+		if (input & 0b00000001)
+		{
+			output |= 0b00000010;
+		}
+		if (input & 0b00000010)
+		{
+			output |= 0b00001000;
+		}
+		if (input & 0b00000100)
+		{
+			output |= 0b00100000;
+		}
+		if (input & 0b00001000)
+		{
+			output |= 0b10000000;
+		}
+	}
+
+	return output;
+}
+
+void ssd1306_display_drawsub_line(uint8_t line, uint8_t *data)
 {
 	i2c_cmd_handle_t cmd;
 
-	uint8_t zero[128];
-	memset(zero, 0x00, sizeof(zero));
-	for (uint8_t i = 0; i < 8; i++)
-	{
-		cmd = i2c_cmd_link_create();
-		i2c_master_start(cmd);
-		i2c_master_write_byte(cmd, (OLED_I2C_ADDRESS << 1) | I2C_MASTER_WRITE, true);
-		i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_SINGLE, true);
-		i2c_master_write_byte(cmd, 0xB0 | i, true); // B0~B7 Set GDDRAM Page Start Address (PAGE0~PAGE7) for Page Addressing Mode
+	cmd = i2c_cmd_link_create();
+	i2c_master_start(cmd);
+	i2c_master_write_byte(cmd, (OLED_I2C_ADDRESS << 1) | I2C_MASTER_WRITE, true);
 
-		i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_DATA_STREAM, true);
-		i2c_master_write(cmd, zero, sizeof(zero), true);
-		i2c_master_stop(cmd);
-		i2c_master_cmd_begin(I2C_NUM_0, cmd, 10 / portTICK_PERIOD_MS);
-		i2c_cmd_link_delete(cmd);
+	i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_SINGLE, true);
+	i2c_master_write_byte(cmd, 0xB0 | line, true); // B0~B7 Set GDDRAM Page Start Address (PAGE0~PAGE7) for Page Addressing Mode
+
+	i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_DATA_STREAM, true);
+	i2c_master_write(cmd, data, OLED_CONFIG_PIXEL_H, true);
+
+	i2c_master_stop(cmd);
+	i2c_master_cmd_begin(I2C_NUM_0, cmd, 10 / portTICK_PERIOD_MS);
+	i2c_cmd_link_delete(cmd);
+}
+
+void ssd1306_display_drawline(uint8_t line, uint8_t *data)
+{
+	uint8_t dataUp[OLED_CONFIG_PIXEL_H];
+	uint8_t dataDn[OLED_CONFIG_PIXEL_H];
+
+	// memset(dataUp, 0x00, sizeof(dataUp));
+	// memset(dataDn, 0x00, sizeof(dataDn));
+
+	for (int i = 0; i < OLED_CONFIG_PIXEL_H; i++)
+	{
+		// dataUp[i] = data[i];
+		// dataDn[i] = data[i];
+
+		dataUp[i] = extract(data[i], true);
+		dataDn[i] = extract(data[i], false);
+	}
+
+	ssd1306_display_drawsub_line(line * 2, dataUp);
+	ssd1306_display_drawsub_line(line * 2 + 1, dataDn);
+}
+
+void task_ssd1306_display_clear(void *ignore)
+{
+	uint8_t zero[OLED_CONFIG_PIXEL_H];
+	memset(zero, 0x00, sizeof(zero));
+
+	for (uint8_t line = 0; line < 4; line++)
+	{
+		ssd1306_display_drawline(line, zero);
 	}
 
 	vTaskDelete(NULL);
@@ -189,53 +265,6 @@ void task_ssd1306_scroll(void *ignore)
 	i2c_cmd_link_delete(cmd);
 
 	vTaskDelete(NULL);
-}
-
-uint8_t extract(uint8_t input, bool up)
-{
-	bool dn = !up;
-	uint8_t output = 0;
-
-	if (up)
-	{
-		if (input & 0b00010000)
-		{
-			output |= 0b00000010;
-		}
-		if (input & 0b00100000)
-		{
-			output |= 0b00001000;
-		}
-		if (input & 0b01000000)
-		{
-			output |= 0b00100000;
-		}
-		if (input & 0b10000000)
-		{
-			output |= 0b10000000;
-		}
-	}
-	if (dn)
-	{
-		if (input & 0b00000001)
-		{
-			output |= 0b00000010;
-		}
-		if (input & 0b00000010)
-		{
-			output |= 0b00001000;
-		}
-		if (input & 0b00000100)
-		{
-			output |= 0b00100000;
-		}
-		if (input & 0b00001000)
-		{
-			output |= 0b10000000;
-		}
-	}
-
-	return output;
 }
 
 void task_ssd1306_display_text(const void *arg_text)

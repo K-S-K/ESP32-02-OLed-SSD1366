@@ -1,6 +1,6 @@
-# Blink Example
+# OLED Display SSD1306 128x32 Example
 
-This project starts a FreeRTOS task to blink an LED.
+This project communicates with SSD1306 128x32 OLED Display.
 
 The main source file of the project is [blink.c](main/blink.c)
 
