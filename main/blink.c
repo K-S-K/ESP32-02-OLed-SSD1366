@@ -10,7 +10,6 @@
 // Configure the LED connection
 #define BLINK_GPIO 3
 
-
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "esp_err.h"
@@ -101,7 +100,7 @@ uint8_t extract(uint8_t input, bool up)
 	bool dn = !up;
 	uint8_t output = 0;
 
-	if (up)
+	if (dn)
 	{
 		if (input & 0b00010000)
 		{
@@ -120,7 +119,7 @@ uint8_t extract(uint8_t input, bool up)
 			output |= 0b10000000;
 		}
 	}
-	if (dn)
+	if (up)
 	{
 		if (input & 0b00000001)
 		{
@@ -267,6 +266,30 @@ void task_ssd1306_scroll(void *ignore)
 	vTaskDelete(NULL);
 }
 
+void task_ssd1306_display_string(const void *arg_text)
+{
+	char *text = (char *)arg_text;
+	uint8_t text_len = strlen(text);
+	uint8_t data[OLED_CONFIG_PIXEL_H];
+	memset(data, 0x00, sizeof(data));
+
+	for (uint8_t i = 0; i < text_len; i++)
+	{
+		int startIndex = i * 8;
+
+		if (startIndex + 8 > OLED_CONFIG_PIXEL_H)
+		{
+			break;
+		}
+
+		memcpy(data + startIndex, font8x8_basic_tr[(uint8_t)text[i]], 8);
+	}
+
+	ssd1306_display_drawline(0, data);
+
+	vTaskDelete(NULL);
+}
+
 void task_ssd1306_display_text(const void *arg_text)
 {
 	char *text = (char *)arg_text;
@@ -335,23 +358,61 @@ void task_blink(void)
 	// Set the GPIO as a push/pull output
 	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
+	int i = 254635;
+
 	// Main applicarion cycle
+
 	while (1)
 	{
-		printf("Turning the LED on\n");
+		i++;
+		char str[12];
+		sprintf(str, "%d", i);
+
+		// printf("Turning the LED on\n");
 		gpio_set_level(BLINK_GPIO, 1);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-		xTaskCreate(&task_ssd1306_display_clear, "ssd1306_display_clear", 2048, NULL, 6, NULL);
-
-		printf("Turning the LED off\n");
+		// printf("Turning the LED off\n");
 		gpio_set_level(BLINK_GPIO, 0);
 		vTaskDelay(500 / portTICK_PERIOD_MS);
+	}
 
+	vTaskDelete(NULL);
+}
+
+void task_count(void)
+{
+	// Configure the IOMUX register for pad BLINK_GPIO
+	// (some pads are muxed to GPIO on reset already,
+	// but some default to other functions
+	// and need to be switched to GPIO).
+	gpio_reset_pin(BLINK_GPIO);
+
+	// Set the GPIO as a push/pull output
+	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+
+	int i = 254635;
+
+	// Main applicarion cycle
+
+	while (1)
+	{
+		i++;
+		char str[12];
+		sprintf(str, "%d", i);
+
+		vTaskDelay(10 / portTICK_PERIOD_MS);
+
+		xTaskCreate(&task_ssd1306_display_string, "display_string", 2048, (void *)str, 6, NULL);
+
+		/*
 		xTaskCreate(&task_ssd1306_display_text, "ssd1306_display_text", 2048,
 					(void *)". + - =",
 					6, NULL);
+		//*/
 	}
+
+	vTaskDelete(NULL);
 }
 
 void app_main(void)
@@ -360,6 +421,7 @@ void app_main(void)
 	ssd1306_init();
 
 	xTaskCreate(&task_blink, "blink", 2048, NULL, 6, NULL);
+	xTaskCreate(&task_count, "count", 2048, NULL, 6, NULL);
 }
 
 // https://github.com/Moddable-OpenSource/moddable/issues/244
