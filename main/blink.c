@@ -166,14 +166,8 @@ void ssd1306_display_drawline(uint8_t line, uint8_t *data)
 	uint8_t dataUp[OLED_CONFIG_PIXEL_H];
 	uint8_t dataDn[OLED_CONFIG_PIXEL_H];
 
-	// memset(dataUp, 0x00, sizeof(dataUp));
-	// memset(dataDn, 0x00, sizeof(dataDn));
-
 	for (int i = 0; i < OLED_CONFIG_PIXEL_H; i++)
 	{
-		// dataUp[i] = data[i];
-		// dataDn[i] = data[i];
-
 		dataUp[i] = extract(data[i], true);
 		dataDn[i] = extract(data[i], false);
 	}
@@ -349,25 +343,8 @@ void task_ssd1306_display_text(const void *arg_text)
 
 void task_blink(void)
 {
-	// Configure the IOMUX register for pad BLINK_GPIO
-	// (some pads are muxed to GPIO on reset already,
-	// but some default to other functions
-	// and need to be switched to GPIO).
-	gpio_reset_pin(BLINK_GPIO);
-
-	// Set the GPIO as a push/pull output
-	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-
-	int i = 254635;
-
-	// Main applicarion cycle
-
 	while (1)
 	{
-		i++;
-		char str[12];
-		sprintf(str, "%d", i);
-
 		// printf("Turning the LED on\n");
 		gpio_set_level(BLINK_GPIO, 1);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -382,18 +359,7 @@ void task_blink(void)
 
 void task_count(void)
 {
-	// Configure the IOMUX register for pad BLINK_GPIO
-	// (some pads are muxed to GPIO on reset already,
-	// but some default to other functions
-	// and need to be switched to GPIO).
-	gpio_reset_pin(BLINK_GPIO);
-
-	// Set the GPIO as a push/pull output
-	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-
 	int i = 254635;
-
-	// Main applicarion cycle
 
 	while (1)
 	{
@@ -415,10 +381,27 @@ void task_count(void)
 	vTaskDelete(NULL);
 }
 
-void app_main(void)
+void app_init(void)
 {
 	i2c_master_init();
 	ssd1306_init();
+
+	// Configure the IOMUX register for pad BLINK_GPIO
+	// (some pads are muxed to GPIO on reset already,
+	// but some default to other functions
+	// and need to be switched to GPIO).
+	gpio_reset_pin(BLINK_GPIO);
+
+	// Set the GPIO as a push/pull output
+	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+}
+
+void app_main(void)
+{
+	app_init();
+
+	xTaskCreate(task_ssd1306_display_clear, "clear", 2048, NULL, 6, NULL);
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
 	xTaskCreate(&task_blink, "blink", 2048, NULL, 6, NULL);
 	xTaskCreate(&task_count, "count", 2048, NULL, 6, NULL);
