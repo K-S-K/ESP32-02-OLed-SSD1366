@@ -3,7 +3,7 @@
 This project communicates with the [SSD1306 128x32 OLED Display](docs/SSD1306.pdf).
 
 The OLED Display pinout:
-![ 128x32 OLED Display view.](docs/pinout.png)
+![ 128x32 OLED Display view.](docs/display.png)
 
 The ESP32 Microcontroller pinout:
 ![The device description.](docs/pinout.png)
