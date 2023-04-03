@@ -1,6 +1,7 @@
 # OLED Display SSD1306 128x32 Example
 
 This project communicates with SSD1306 128x32 OLED Display.
+[The SSD1306 OLED Display documentation.](docs/SSD1306.pdf)
 
 The main source file of the project is [blink.c](main/blink.c)
 
