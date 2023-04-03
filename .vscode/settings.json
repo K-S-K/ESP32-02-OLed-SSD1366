@@ -3,6 +3,8 @@
         "freertos.h": "c",
         "stdio.h": "c",
         "*.inc": "c",
-        "atomic": "c"
+        "atomic": "c",
+        "ssd1366.h": "c",
+        "ssd1366_drv.h": "c"
     }
 }

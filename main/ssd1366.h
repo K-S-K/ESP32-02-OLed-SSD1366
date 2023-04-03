@@ -1,6 +1,10 @@
 #ifndef MAIN_SSD1366_H_
 #define MAIN_SSD1366_H_
 
+// Define the hardware configuration
+#define SDA_PIN GPIO_NUM_21
+#define SCL_PIN GPIO_NUM_22
+
 // Following definitions are followed from 
 // http://robotcantalk.blogspot.com/2015/03/interfacing-arduino-with-ssd1306-driven.html
 
