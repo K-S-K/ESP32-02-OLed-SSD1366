@@ -40,15 +40,11 @@ void task_count(void)
 		char str[12];
 		sprintf(str, "%d", i);
 
+		txtDescr txt = {0, str};
+
 		vTaskDelay(10 / portTICK_PERIOD_MS);
 
-		xTaskCreate(&task_ssd1306_display_string, "display_string", 2048, (void *)str, 6, NULL);
-
-		/*
-		xTaskCreate(&task_ssd1306_display_text, "ssd1306_display_text", 2048,
-					(void *)". + - =",
-					6, NULL);
-		//*/
+		xTaskCreate(&task_ssd1306_display_text, "display_text", 2048, (void *)&txt, 6, NULL);
 	}
 
 	vTaskDelete(NULL);
@@ -74,7 +70,7 @@ void app_main(void)
 	app_init();
 
 	xTaskCreate(task_ssd1306_display_clear, "clear", 2048, NULL, 6, NULL);
-	vTaskDelay(1000 / portTICK_PERIOD_MS);
+	vTaskDelay(500 / portTICK_PERIOD_MS);
 
 	xTaskCreate(&task_blink, "blink", 2048, NULL, 6, NULL);
 	xTaskCreate(&task_count, "count", 2048, NULL, 6, NULL);
