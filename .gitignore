@@ -15,3 +15,4 @@
 *.log
 
 build/**
+managed_components/**

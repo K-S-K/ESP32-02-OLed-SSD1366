@@ -5,6 +5,10 @@
         "*.inc": "c",
         "atomic": "c",
         "ssd1366.h": "c",
-        "ssd1366_drv.h": "c"
+        "ssd1366_drv.h": "c",
+        "*.tcc": "c",
+        "tuple": "c",
+        "*.cpp": "cpp",
+        "*.hpp": "cpp"
     }
 }
