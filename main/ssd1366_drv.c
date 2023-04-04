@@ -13,7 +13,7 @@
 
 #include "ssd1366.h"
 #include "ssd1366_drv.h"
-#include "font8x8.h"
+#include "font08x08.h"
 
 #define tag "SSD1306"
 
@@ -223,14 +223,14 @@ void task_ssd1306_display_text(const txtDescr *txt)
 
     for (uint8_t i = 0; i < text_len; i++)
     {
-        int startIndex = i * 8;
+        int startIndex = i * font08x08_size;
 
-        if (startIndex + 8 > OLED_CONFIG_PIXEL_H)
+        if (startIndex + font08x08_size > OLED_CONFIG_PIXEL_H)
         {
             break;
         }
 
-        memcpy(data + startIndex, font8x8[(uint8_t)text[i]], 8);
+        memcpy(data + startIndex, font08x08_data[(uint8_t)text[i]], font08x08_size);
     }
 
     ssd1306_display_drawline(line, data);

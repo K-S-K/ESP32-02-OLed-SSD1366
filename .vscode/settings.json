@@ -4,7 +4,7 @@
         "stdio.h": "c",
         "*.inc": "c",
         "atomic": "c",
-        "font8x8.h": "c",
+        "font08x08.h": "c",
         "ssd1366.h": "c",
         "ssd1366_drv.h": "c"
     }

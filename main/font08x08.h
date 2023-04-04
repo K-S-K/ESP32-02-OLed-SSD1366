@@ -1,14 +1,8 @@
-/*
- * font8x8.h
- *
- *  Created on: 2017/05/03
- *      Author: yanbe
- */
+#ifndef MAIN_FONT08X08
+#define MAIN_FONT08X08
 
-#ifndef MAIN_FONT8X8
-#define MAIN_FONT8X8
-
-uint8_t font8x8[128][8] = {
+uint8_t font08x08_size = 8;
+uint8_t font08x08_data[128][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   // U+0000 (nul)
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   // U+0001
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   // U+0002
@@ -139,4 +133,4 @@ uint8_t font8x8[128][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }    // U+007F
 };
 
-#endif /* MAIN_FONT8X8 */
+#endif /* MAIN_FONT08X08 */
