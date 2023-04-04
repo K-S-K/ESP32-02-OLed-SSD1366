@@ -13,7 +13,7 @@
 
 #include "ssd1366.h"
 #include "ssd1366_drv.h"
-#include "font8x8_basic.h"
+#include "font8x8.h"
 
 #define tag "SSD1306"
 
@@ -230,7 +230,7 @@ void task_ssd1306_display_text(const txtDescr *txt)
             break;
         }
 
-        memcpy(data + startIndex, font8x8_basic_tr[(uint8_t)text[i]], 8);
+        memcpy(data + startIndex, font8x8[(uint8_t)text[i]], 8);
     }
 
     ssd1306_display_drawline(line, data);
