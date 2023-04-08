@@ -2,6 +2,7 @@
 #define MAIN_FONT08X08
 
 uint8_t font08x08_size = 8;
+uint8_t font08x08_width = 8;
 uint8_t font08x08_height = 8;
 uint8_t font08x08_data[128][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   // U+0000 (nul)

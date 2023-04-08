@@ -88,7 +88,7 @@ void task_ssd1306_display_pattern(void *ignore)
         i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_SINGLE, true);
         i2c_master_write_byte(cmd, 0xB0 | i, true);
         i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_DATA_STREAM, true);
-        for (uint8_t j = 0; j < OLED_CONFIG_PIXEL_H; j++)
+        for (uint8_t j = 0; j < OLED_DISPLAY_WIDTH_PX; j++)
         {
             i2c_master_write_byte(cmd, 0xFF >> (j % 8), true);
         }
@@ -112,7 +112,7 @@ void ssd1306_display_drawsub_line(uint8_t line, uint8_t *data)
     i2c_master_write_byte(cmd, 0xB0 | line, true); // B0~B7 Set GDDRAM Page Start Address (PAGE0~PAGE7) for Page Addressing Mode
 
     i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_DATA_STREAM, true);
-    i2c_master_write(cmd, data, OLED_CONFIG_PIXEL_H, true);
+    i2c_master_write(cmd, data, OLED_DISPLAY_WIDTH_PX, true);
 
     i2c_master_stop(cmd);
     i2c_master_cmd_begin(I2C_NUM_0, cmd, 10 / portTICK_PERIOD_MS);
@@ -171,7 +171,7 @@ void ssd1306_display_drawline(uint8_t line, uint8_t *data)
     /*
     // draw byte map
     int font_size = 8;
-    for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+    for (int i = 0; i < OLED_DISPLAY_WIDTH_PX / 8; i++)
     {
         printf("i:%02d: ", i);
 
@@ -185,10 +185,10 @@ void ssd1306_display_drawline(uint8_t line, uint8_t *data)
     //*/
 
     // printf("report end\n");
-    uint8_t dataUp[OLED_CONFIG_PIXEL_H];
-    uint8_t dataDn[OLED_CONFIG_PIXEL_H];
+    uint8_t dataUp[OLED_DISPLAY_WIDTH_PX];
+    uint8_t dataDn[OLED_DISPLAY_WIDTH_PX];
 
-    for (int i = 0; i < OLED_CONFIG_PIXEL_H; i++)
+    for (int i = 0; i < OLED_DISPLAY_WIDTH_PX; i++)
     {
         dataUp[i] = extract(data[i], true);
         dataDn[i] = extract(data[i], false);
@@ -200,7 +200,7 @@ void ssd1306_display_drawline(uint8_t line, uint8_t *data)
 
 void task_ssd1306_display_clear(void *ignore)
 {
-    uint8_t zero[OLED_CONFIG_PIXEL_H];
+    uint8_t zero[OLED_DISPLAY_WIDTH_PX];
     memset(zero, 0x00, sizeof(zero));
 
     for (uint8_t line = 0; line < 8; line++)
@@ -245,23 +245,27 @@ void task_ssd1306_contrast(void *ignore)
 
 void task_ssd1306_display_text(const txtDescr *txt)
 {
-    bool m = false;
+    bool enable_console_output = false;
     int line = txt->line;
     char *text = txt->text;
+    tFont font = txt->font;
     uint8_t font_size = 0;
+    uint8_t font_width = 0;
     uint8_t font_height = 0;
-    switch (txt->font)
+    switch (font)
     {
     case F08x08:
-        if (m)
+        if (enable_console_output)
             printf("F08x08 - 1\n");
+        font_width = font08x08_width;
         font_size = font08x08_size;
         font_height = font08x08_height;
         break;
 
     case F16x16:
-        if (m)
+        if (enable_console_output)
             printf("font 16x16 - 1\n");
+        font_width = font16x16_width;
         font_size = font16x16_size;
         font_height = font16x16_height;
         break;
@@ -272,38 +276,40 @@ void task_ssd1306_display_text(const txtDescr *txt)
         break;
     }
 
-    uint8_t page_count = font_height / 8;
-    uint8_t text_len = strlen(text);
-    uint16_t picture_size = OLED_CONFIG_PIXEL_H * page_count;
+    uint16_t text_len = strlen(text);
+    uint16_t allowed_text_len = OLED_DISPLAY_WIDTH_PX / font_width;
+
+    if (text_len > allowed_text_len) {
+        text[allowed_text_len] = 0;
+        text_len = strlen(text);
+        printf("Text is too long, string will be cut to: '%s', length=%d", text, text_len);
+    }
+
+    uint8_t text_page_count = font_height / OLED_PAGE_HEIGHT_PX;
+    uint16_t picture_size = OLED_DISPLAY_WIDTH_PX * text_page_count; // picture size will be 128 (bytes) if font takes 1 page, and 256 (bytes) if font takes 2 pages
 
     uint8_t img_data[picture_size];
     memset(img_data, 0x00, sizeof(img_data));
 
-    if (m)
-        printf("line = %d; page_count = %d; font_height = %d; font_size = %d; picture_size=%d; sizeof(img_data)=%d\n",
-               line, page_count, font_height, font_size, picture_size, sizeof(img_data));
+    if (enable_console_output)
+        printf("line = %d; text_page_count = %d; font_height = %d; font_size = %d; picture_size=%d; sizeof(img_data)=%d\n",
+               line, text_page_count, font_height, font_size, picture_size, sizeof(img_data));
 
-    for (uint8_t i = 0; i < text_len; i++)
+    for (uint16_t i = 0; i < text_len; i++)
     {
-        int startIndex = i * font_size;
+        uint16_t startIndex = i * font_size;
 
-        if (startIndex + font_size > picture_size)
-        {
-            printf("Out after 1st symbol\n");
-            break;
-        }
-
-        switch (txt->font)
+        switch (font)
         {
         case F08x08:
             memcpy(img_data + startIndex, font08x08_data[(uint8_t)text[i]], font_size);
-            if (m)
+            if (enable_console_output)
                 printf("font 08x08 - symbol c:%c(%d) is copied\n", text[i], (uint8_t)text[i]);
             break;
 
         case F16x16:
             memcpy(img_data + startIndex, font16x16_data[(uint8_t)text[i]], font_size);
-            if (m)
+            if (enable_console_output)
                 printf("font 16x16 - symbol c:%c(%d) is copied\n", text[i], (uint8_t)text[i]);
             break;
 
@@ -312,17 +318,14 @@ void task_ssd1306_display_text(const txtDescr *txt)
             return;
             break;
         }
-
-        // TODO: REMOVE NEXT LINE!
-        // break;
     }
 
-    if (m)
+    if (enable_console_output)
         printf("Primary draw complete\n");
 
     /*
     // draw byte map
-    for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+    for (int i = 0; i < OLED_DISPLAY_WIDTH_PX / 8; i++)
     {
         printf("i:%02d: ", i);
 
@@ -342,7 +345,7 @@ void task_ssd1306_display_text(const txtDescr *txt)
 
     //*
     // draw bit map
-    // for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+    // for (int i = 0; i < OLED_DISPLAY_WIDTH_PX / 8; i++)
     printf("The bit map for img_data\n");
     for (int i = 0; i < 64 / 8; i += font_size)
     {
@@ -354,16 +357,16 @@ void task_ssd1306_display_text(const txtDescr *txt)
     }
     //*/
 
-    if (page_count == 1)
+    if (text_page_count == 1)
     {
         ssd1306_display_drawline(line, img_data);
     }
     else
     {
-        for (uint8_t p = 0; p < page_count; p++)
+        for (uint8_t p = 0; p < text_page_count; p++)
         {
-            int lim = OLED_CONFIG_PIXEL_H / font08x08_height;
-            uint8_t page_data[OLED_CONFIG_PIXEL_H];
+            int lim = OLED_DISPLAY_WIDTH_PX / font08x08_height;
+            uint8_t page_data[OLED_DISPLAY_WIDTH_PX];
             memset(page_data, 0x00, sizeof(page_data));
 
             // if(m) printf(" p = %d; lim=%d; Copy Begin\n", p, lim);
@@ -381,7 +384,7 @@ void task_ssd1306_display_text(const txtDescr *txt)
 
             /*
             // draw bit map
-            // for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+            // for (int i = 0; i < OLED_DISPLAY_WIDTH_PX / 8; i++)
             printf("The bit map for page_data[%d]\n", p);
             for (int i = 0; i < 64 / 8; i += font_size)
             {
@@ -395,7 +398,7 @@ void task_ssd1306_display_text(const txtDescr *txt)
 
             /*
             // Transpose every 8x8 square of line
-            uint8_t page_out[OLED_CONFIG_PIXEL_H];
+            uint8_t page_out[OLED_DISPLAY_WIDTH_PX];
             memset(page_out, 0x00, sizeof(page_out));
 
             uint8_t mask[8] = {
@@ -408,7 +411,7 @@ void task_ssd1306_display_text(const txtDescr *txt)
                 0b01000000,
                 0b10000000};
 
-            for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i+=8)
+            for (int i = 0; i < OLED_DISPLAY_WIDTH_PX / 8; i+=8)
             {
                 for (int j = 0; j < 8; j++)
                 {
@@ -427,7 +430,7 @@ void task_ssd1306_display_text(const txtDescr *txt)
 
             /*
             // draw bit map
-            // for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+            // for (int i = 0; i < OLED_DISPLAY_WIDTH_PX / 8; i++)
             for (int i = 0; i < 32 / 8; i+=8)
             {
                 for (int j = 0; j < 8; j++)
@@ -442,14 +445,14 @@ void task_ssd1306_display_text(const txtDescr *txt)
 
             // if(m)printf(" p = %d; lim=%d; Copy End\n", p, lim);
 
-            if (m)
+            if (enable_console_output)
                 printf("send page_data to line=%d;\n", line + p);
 
             // Send 8-bit height line of the image to the screen
             ssd1306_display_drawline(line + p, page_data);
             // ssd1306_display_drawline(line + p, page_out);
 
-            if (m)
+            if (enable_console_output)
                 printf("page_data sent; line=%d;\n", line + p);
 
             // break;

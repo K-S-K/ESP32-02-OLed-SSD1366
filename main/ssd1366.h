@@ -12,7 +12,8 @@
 #define OLED_I2C_ADDRESS   0x3C
 
 // Configuration data
-#define OLED_CONFIG_PIXEL_H             0x80
+#define OLED_DISPLAY_WIDTH_PX           0x80
+#define OLED_PAGE_HEIGHT_PX             0x08
 
 // Control byte
 #define OLED_CONTROL_BYTE_CMD_SINGLE    0x80
