@@ -14,8 +14,21 @@
 #include "ssd1366.h"
 #include "ssd1366_drv.h"
 #include "font08x08.h"
+#include "font16x16.h"
 
 #define tag "SSD1306"
+
+// https://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)       \
+    ((byte)&0x80 ? '*' : '.'),     \
+        ((byte)&0x40 ? '*' : '.'), \
+        ((byte)&0x20 ? '*' : '.'), \
+        ((byte)&0x10 ? '*' : '.'), \
+        ((byte)&0x08 ? '*' : '.'), \
+        ((byte)&0x04 ? '*' : '.'), \
+        ((byte)&0x02 ? '*' : '.'), \
+        ((byte)&0x01 ? '*' : '.')
 
 void i2c_master_init()
 {
@@ -155,6 +168,23 @@ uint8_t extract(uint8_t input, bool up)
 
 void ssd1306_display_drawline(uint8_t line, uint8_t *data)
 {
+    /*
+    // draw byte map
+    int font_size = 8;
+    for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+    {
+        printf("i:%02d: ", i);
+
+        for (int j = 0; j < font_size; j++)
+        {
+            printf(" 0x%02x", data[i * 8 + j]);
+        }
+
+        printf("\n");
+    }
+    //*/
+
+    // printf("report end\n");
     uint8_t dataUp[OLED_CONFIG_PIXEL_H];
     uint8_t dataDn[OLED_CONFIG_PIXEL_H];
 
@@ -173,9 +203,9 @@ void task_ssd1306_display_clear(void *ignore)
     uint8_t zero[OLED_CONFIG_PIXEL_H];
     memset(zero, 0x00, sizeof(zero));
 
-    for (uint8_t line = 0; line < 4; line++)
+    for (uint8_t line = 0; line < 8; line++)
     {
-        ssd1306_display_drawline(line, zero);
+        ssd1306_display_drawsub_line(line, zero);
     }
 
     vTaskDelete(NULL);
@@ -215,25 +245,216 @@ void task_ssd1306_contrast(void *ignore)
 
 void task_ssd1306_display_text(const txtDescr *txt)
 {
+    bool m = false;
     int line = txt->line;
     char *text = txt->text;
+    uint8_t font_size = 0;
+    uint8_t font_height = 0;
+    switch (txt->font)
+    {
+    case F08x08:
+        if (m)
+            printf("F08x08 - 1\n");
+        font_size = font08x08_size;
+        font_height = font08x08_height;
+        break;
+
+    case F16x16:
+        if (m)
+            printf("font 16x16 - 1\n");
+        font_size = font16x16_size;
+        font_height = font16x16_height;
+        break;
+
+    default:
+        vTaskDelete(NULL);
+        return;
+        break;
+    }
+
+    uint8_t page_count = font_height / 8;
     uint8_t text_len = strlen(text);
-    uint8_t data[OLED_CONFIG_PIXEL_H];
-    memset(data, 0x00, sizeof(data));
+    uint16_t picture_size = OLED_CONFIG_PIXEL_H * page_count;
+
+    uint8_t img_data[picture_size];
+    memset(img_data, 0x00, sizeof(img_data));
+
+    if (m)
+        printf("line = %d; page_count = %d; font_height = %d; font_size = %d; picture_size=%d; sizeof(img_data)=%d\n",
+               line, page_count, font_height, font_size, picture_size, sizeof(img_data));
 
     for (uint8_t i = 0; i < text_len; i++)
     {
-        int startIndex = i * font08x08_size;
+        int startIndex = i * font_size;
 
-        if (startIndex + font08x08_size > OLED_CONFIG_PIXEL_H)
+        if (startIndex + font_size > picture_size)
         {
+            printf("Out after 1st symbol\n");
             break;
         }
 
-        memcpy(data + startIndex, font08x08_data[(uint8_t)text[i]], font08x08_size);
+        switch (txt->font)
+        {
+        case F08x08:
+            memcpy(img_data + startIndex, font08x08_data[(uint8_t)text[i]], font_size);
+            if (m)
+                printf("font 08x08 - symbol c:%c(%d) is copied\n", text[i], (uint8_t)text[i]);
+            break;
+
+        case F16x16:
+            memcpy(img_data + startIndex, font16x16_data[(uint8_t)text[i]], font_size);
+            if (m)
+                printf("font 16x16 - symbol c:%c(%d) is copied\n", text[i], (uint8_t)text[i]);
+            break;
+
+        default:
+            vTaskDelete(NULL);
+            return;
+            break;
+        }
+
+        // TODO: REMOVE NEXT LINE!
+        // break;
     }
 
-    ssd1306_display_drawline(line, data);
+    if (m)
+        printf("Primary draw complete\n");
+
+    /*
+    // draw byte map
+    for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+    {
+        printf("i:%02d: ", i);
+
+        for (int j = 0; j < font_size; j++)
+        {
+            printf(" 0x%02x", img_data[i*8 + j]);
+        }
+
+        if (i < text_len)
+        {
+            printf(" c:%c(%d): ", text[i], (uint8_t)text[i]);
+        }
+
+        printf("\n");
+    }
+    //*/
+
+    //*
+    // draw bit map
+    // for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+    printf("The bit map for img_data\n");
+    for (int i = 0; i < 64 / 8; i += font_size)
+    {
+        for (int j = 0; j < font_size; j++)
+        {
+            printf(" " BYTE_TO_BINARY_PATTERN "\n", BYTE_TO_BINARY(img_data[i * 8 + j]));
+        }
+        printf("\n");
+    }
+    //*/
+
+    if (page_count == 1)
+    {
+        ssd1306_display_drawline(line, img_data);
+    }
+    else
+    {
+        for (uint8_t p = 0; p < page_count; p++)
+        {
+            int lim = OLED_CONFIG_PIXEL_H / font08x08_height;
+            uint8_t page_data[OLED_CONFIG_PIXEL_H];
+            memset(page_data, 0x00, sizeof(page_data));
+
+            // if(m) printf(" p = %d; lim=%d; Copy Begin\n", p, lim);
+
+            // Extract 8-bit height line from the image
+            for (uint8_t i = 0; i < lim; i += font08x08_height)
+            {
+                int startIndex_dst = i * 8;
+                int startIndex_src = i * font_height + p * 8;
+
+                // printf(" i = %d; startIndex_dst = %d; startIndex_src = %d;\n", i, startIndex_dst, startIndex_src);
+
+                memcpy(page_data + startIndex_dst, img_data + startIndex_src, 8);
+            }
+
+            /*
+            // draw bit map
+            // for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+            printf("The bit map for page_data[%d]\n", p);
+            for (int i = 0; i < 64 / 8; i += font_size)
+            {
+                for (int j = 0; j < font_size; j++)
+                {
+                    printf(" " BYTE_TO_BINARY_PATTERN "\n", BYTE_TO_BINARY(page_data[i * 8 + j]));
+                }
+                printf("\n");
+            }
+            //*/
+
+            /*
+            // Transpose every 8x8 square of line
+            uint8_t page_out[OLED_CONFIG_PIXEL_H];
+            memset(page_out, 0x00, sizeof(page_out));
+
+            uint8_t mask[8] = {
+                0b00000001,
+                0b00000010,
+                0b00000100,
+                0b00001000,
+                0b00010000,
+                0b00100000,
+                0b01000000,
+                0b10000000};
+
+            for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i+=8)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    uint8_t x = page_data[i * 8 + j];
+
+                    for (int k = 0; k < 8; k++)
+                    {
+                        if (x & mask[k])
+                        {
+                            page_out[i * 8 + k] |= mask[j];
+                        }
+                    }
+                }
+            }
+            //*/
+
+            /*
+            // draw bit map
+            // for (int i = 0; i < OLED_CONFIG_PIXEL_H / 8; i++)
+            for (int i = 0; i < 32 / 8; i+=8)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    printf(" " BYTE_TO_BINARY_PATTERN "\n", BYTE_TO_BINARY(page_out[i * 8 + j]));
+                }
+                printf("\n");
+            }
+            //*/
+
+            // break;
+
+            // if(m)printf(" p = %d; lim=%d; Copy End\n", p, lim);
+
+            if (m)
+                printf("send page_data to line=%d;\n", line + p);
+
+            // Send 8-bit height line of the image to the screen
+            ssd1306_display_drawline(line + p, page_data);
+            // ssd1306_display_drawline(line + p, page_out);
+
+            if (m)
+                printf("page_data sent; line=%d;\n", line + p);
+
+            // break;
+        }
+    }
 
     vTaskDelete(NULL);
 }

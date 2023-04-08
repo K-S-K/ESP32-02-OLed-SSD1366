@@ -1,5 +1,5 @@
 // idf.py build
-// idf.py flash -p COM3
+// idf.py flash -p COM3 monitor
 #include <stdio.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -13,6 +13,7 @@
 
 // Configure the LED connection
 #define BLINK_GPIO 3
+int p = 0;
 
 void task_blink(void)
 {
@@ -25,6 +26,15 @@ void task_blink(void)
 		// printf("Turning the LED off\n");
 		gpio_set_level(BLINK_GPIO, 0);
 		vTaskDelay(500 / portTICK_PERIOD_MS);
+
+		if (p == 3)
+		{
+			p = 0;
+		}
+		else
+		{
+			p++;
+		}
 	}
 
 	vTaskDelete(NULL);
@@ -37,14 +47,18 @@ void task_count(void)
 	while (1)
 	{
 		i++;
-		char str[12];
-		sprintf(str, "%d", i);
+		int pg = p;
+		char str[16];
+		sprintf(str, "%d: %d", pg, i);
 
-		txtDescr txt = {0, str};
-
-		vTaskDelay(10 / portTICK_PERIOD_MS);
+		// txtDescr txt = {pg, str, F08x08};
+		// txtDescr txt = {0, "-", F08x08};
+		// txtDescr txt = {0, "A", F08x08};
+		txtDescr txt = {0, "o", F16x16};
 
 		xTaskCreate(&task_ssd1306_display_text, "display_text", 2048, (void *)&txt, 6, NULL);
+
+		vTaskDelay(10000 / portTICK_PERIOD_MS);
 	}
 
 	vTaskDelete(NULL);

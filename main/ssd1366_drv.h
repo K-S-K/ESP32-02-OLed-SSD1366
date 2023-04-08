@@ -1,7 +1,11 @@
+
+typedef enum { F08x08, F16x16 } tFont;
+
 typedef struct
 {
     int line;
     char *text;
+    tFont font;
 } txtDescr;
 
 void i2c_master_init();
