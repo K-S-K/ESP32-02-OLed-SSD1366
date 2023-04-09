@@ -33,7 +33,7 @@ void task_blink(void)
 		}
 		else
 		{
-			p++;
+			p += 3;
 		}
 	}
 
@@ -42,7 +42,10 @@ void task_blink(void)
 
 void task_count(void)
 {
-	int i = 254635;
+	int i = 25463;
+
+	txtDescr txt16 = {1, "ABCD", F16x16};
+	xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt16, 6, NULL);
 
 	while (1)
 	{
@@ -51,9 +54,10 @@ void task_count(void)
 		char str[16];
 		sprintf(str, "%d: %d", pg, i);
 
-		// txtDescr txt = {pg, str, F08x08};
+		txtDescr txt = {pg, str, F08x08};
 		// txtDescr txt = {0, "-", F08x08};
-		txtDescr txt = {0, "--", F16x16};
+		// txtDescr txt = {0, "+-", F16x16};
+		// txtDescr txt2 = {1, "ABCD", F16x16};
 		// txtDescr txt = {0, "A", F08x08};
 		// txtDescr txt1 = {0, "-", F16x16};
 		// txtDescr txt2 = {0, ",", F16x16};
@@ -64,7 +68,7 @@ void task_count(void)
 		// xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt2, 6, NULL);
 		xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt, 6, NULL);
 
-		vTaskDelay(10000 / portTICK_PERIOD_MS);
+		vTaskDelay(50 / portTICK_PERIOD_MS);
 	}
 
 	vTaskDelete(NULL);

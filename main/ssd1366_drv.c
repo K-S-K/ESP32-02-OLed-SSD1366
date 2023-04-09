@@ -353,18 +353,18 @@ void task_ssd1306_display_text(const txtDescr *txt) // TODO guard against multil
     if (font_height_in_pages == 1)
     {
         ssd1306_display_drawline(target_page, img_data);
-        report_bytes(img_data, font_width);
+        // report_bytes(img_data, font_width);
     }
     else
     {
         if (font_height_in_pages == 2)
         {
-            report_bytes(img_data, font_width);
+            // report_bytes(img_data, font_width);
             for (uint8_t p = 0; p < font_height_in_pages; p++)
             {
                 // printf("page_number=%d\n", p);
 
-                int symbols_in_line = OLED_DISPLAY_WIDTH_PX / font_height;
+                    int symbols_in_line = OLED_DISPLAY_WIDTH_PX / font_height;
                 uint8_t page_data[OLED_DISPLAY_WIDTH_PX];
                 memset(page_data, 0x00, sizeof(page_data));
 
@@ -381,7 +381,7 @@ void task_ssd1306_display_text(const txtDescr *txt) // TODO guard against multil
 
                 // Send 8-bit height line of the image to the screen
                 ssd1306_display_drawline(target_page + p, page_data);
-                report_bytes(page_data, font_width);
+                // report_bytes(page_data, font_width);
 
                 if (enable_console_output)
                     printf("page_data sent; line=%d;\n", target_page + p);
