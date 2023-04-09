@@ -53,10 +53,16 @@ void task_count(void)
 
 		// txtDescr txt = {pg, str, F08x08};
 		// txtDescr txt = {0, "-", F08x08};
+		txtDescr txt = {0, "--", F16x16};
 		// txtDescr txt = {0, "A", F08x08};
-		txtDescr txt = {0, "o", F16x16};
+		// txtDescr txt1 = {0, "-", F16x16};
+		// txtDescr txt2 = {0, ",", F16x16};
+		// txtDescr txt = {2, "-", F16x16};
+		// txtDescr txt = {3, "-", F16x16};
 
-		xTaskCreate(&task_ssd1306_display_text, "display_text", 2048, (void *)&txt, 6, NULL);
+		// xTaskCreate(&task_ssd1306_display_text, "display_text1", 2048, (void *)&txt1, 6, NULL);
+		// xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt2, 6, NULL);
+		xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt, 6, NULL);
 
 		vTaskDelay(10000 / portTICK_PERIOD_MS);
 	}
