@@ -251,8 +251,9 @@ void task_ssd1306_contrast(void *ignore)
     vTaskDelete(NULL);
 }
 
-void task_ssd1306_display_text(const txtDescr *txt) // TODO guard against multiline text
+void task_ssd1306_display_text(void *data) // TODO guard against multiline text
 {
+    txtDescr *txt = (txtDescr *)(data);
     bool enable_console_output = false;
     int target_page = txt->line;
     char *text = txt->text;

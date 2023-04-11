@@ -3,6 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := blink
+PROJECT_NAME := oled
 
 include $(IDF_PATH)/make/project.mk
