@@ -6,7 +6,7 @@ This project communicates with the SSD1306 128x32 OLED Display ([pdf](docs/SSD13
 
 
 #### The project *in vivo*:
-![](docs/blink.gif)
+![](docs/oled.gif)
 
 
 #### The ESP32 Microcontroller pinout:
