@@ -364,11 +364,12 @@ void task_ssd1306_display_text(const txtDescr *txt) // TODO guard against multil
             {
                 // printf("page_number=%d\n", p);
 
-                    int symbols_in_line = OLED_DISPLAY_WIDTH_PX / font_height;
+                int symbols_in_line = OLED_DISPLAY_WIDTH_PX / font_width;
                 uint8_t page_data[OLED_DISPLAY_WIDTH_PX];
                 memset(page_data, 0x00, sizeof(page_data));
 
-                for (uint8_t i = 0; i < symbols_in_line; i++)
+                int copy_steps = symbols_in_line * (font_width / 8);
+                for (uint8_t i = 0; i < copy_steps; i++)
                 {
                     int startIndex_dst = i * 8;
                     int startIndex_src = i * font_height + p * 8;

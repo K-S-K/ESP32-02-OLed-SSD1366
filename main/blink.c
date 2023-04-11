@@ -44,7 +44,7 @@ void task_count(void)
 {
 	int i = 25463;
 
-	txtDescr txt16 = {1, "ABCD", F16x16};
+	txtDescr txt16 = {1, "ABCDEFGH", F16x16};
 	xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt16, 6, NULL);
 
 	while (1)
