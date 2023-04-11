@@ -5,6 +5,7 @@
         "*.inc": "c",
         "atomic": "c",
         "font08x08.h": "c",
+        "font16x16.h": "c",
         "ssd1366.h": "c",
         "ssd1366_drv.h": "c"
     }
