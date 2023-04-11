@@ -15,7 +15,7 @@
 #define BLINK_GPIO 3
 int p = 0;
 
-void task_blink(void)
+void task_blink(void *ignore)
 {
 	while (1)
 	{
@@ -40,7 +40,7 @@ void task_blink(void)
 	vTaskDelete(NULL);
 }
 
-void task_count(void)
+void task_count(void *ignore)
 {
 	int i = 25463;
 
