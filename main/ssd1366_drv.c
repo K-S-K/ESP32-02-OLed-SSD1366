@@ -1,17 +1,16 @@
 #include <stdio.h>
+#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
-#include <string.h>
-#include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "esp_err.h"
 #include "esp_log.h"
 
-#include "sdkconfig.h"
+// #include "sdkconfig.h"
 
-#include "ssd1366.h"
+#include "ssd1366_def.h"
 #include "ssd1366_drv.h"
 #include "font08x08.h"
 #include "font16x16.h"
@@ -29,19 +28,6 @@
         ((byte)&0x04 ? '*' : '.'), \
         ((byte)&0x02 ? '*' : '.'), \
         ((byte)&0x01 ? '*' : '.')
-
-void i2c_master_init()
-{
-    i2c_config_t i2c_config = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = SDA_PIN,
-        .scl_io_num = SCL_PIN,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 1000000};
-    i2c_param_config(I2C_NUM_0, &i2c_config);
-    i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
-}
 
 void ssd1306_init()
 {

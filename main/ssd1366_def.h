@@ -1,9 +1,5 @@
-#ifndef MAIN_SSD1366_H_
-#define MAIN_SSD1366_H_
-
-// Define the hardware configuration
-#define SDA_PIN GPIO_NUM_21
-#define SCL_PIN GPIO_NUM_22
+#ifndef MAIN_SSD1366_H
+#define MAIN_SSD1366_H
 
 // Following definitions are followed from 
 // http://robotcantalk.blogspot.com/2015/03/interfacing-arduino-with-ssd1306-driven.html
@@ -51,4 +47,4 @@
 // Charge Pump (pg.62)
 #define OLED_CMD_SET_CHARGE_PUMP        0x8D    // follow with 0x14
 
-#endif /* MAIN_SSD1366_H_ */
+#endif /* MAIN_SSD1366_H */

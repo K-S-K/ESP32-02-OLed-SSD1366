@@ -1,4 +1,3 @@
-
 typedef enum
 {
     F08x08,
@@ -12,7 +11,6 @@ typedef struct
     tFont font;
 } txtDescr;
 
-void i2c_master_init();
 void ssd1306_init();
 
 void task_ssd1306_contrast(void *ignore);

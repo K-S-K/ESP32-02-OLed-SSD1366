@@ -7,6 +7,7 @@
         "font08x08.h": "c",
         "font16x16.h": "c",
         "ssd1366.h": "c",
+        "hardware_drv.c": "c",
         "ssd1366_drv.h": "c"
     }
 }
