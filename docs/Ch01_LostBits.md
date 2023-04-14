@@ -7,7 +7,7 @@ We have a [font file](../main/font08x08.h) that contains eight bytes for every s
 ![Half - lines](Ch01_fig01_TwoLines.png)
 
 The result we received is far from the expected.
-- We have the suspicious nerrow lins with height 4 pixel instead of 8.
+- We have the suspicious narrow lins with height 4 pixel instead of 8.
 - It looks like the screen contains 8 lines with 4 pixel height instead of 4 line with 8 pixel height.
 - The symbols we have on the screen are corrupted.
 
