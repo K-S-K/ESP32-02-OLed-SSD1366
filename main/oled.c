@@ -9,6 +9,7 @@
 #include "esp_err.h"
 #include "esp_log.h"
 
+#include "hardware_drv.h"
 #include "ssd1366_drv.h"
 
 // Configure the LED connection
