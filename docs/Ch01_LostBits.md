@@ -12,10 +12,12 @@ The result we received is far from the expected.
 - The symbols we have on the screen are corrupted.
 
 
-Let's take a look onto the font.
+Let's take a look onto the font.<br>
+![Crazy lines](Ch01_fig02.png)
 
+All looks good. 
 
-All looks good. Let's make another experiment. Try to print two lines::<br>
+Let's make another experiment. Try to print two lines:<br>
 "1234"<br>"ABCD":<br>
 ![Crazy lines](Ch01_fig03.png)
 
