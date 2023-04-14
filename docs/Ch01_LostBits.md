@@ -15,14 +15,11 @@ The result we received is far from the expected.
 Let's take a look onto the font.
 
 
-All looks good. Let's make another experiment. Try to print two lines:
-
-"1234" and "ABCD"
-
+All looks good. Let's make another experiment. Try to print two lines::<br>
+"1234"<br>"ABCD":<br>
 ![Crazy lines](Ch01_fig03.png)
 
-That's look more understandable. Let's take a deeper look into the pixels.
-
+That's look more understandable. Let's take a deeper look into the pixels.:<br>
 ![Crazy lines](Ch01_fig04.png)
 
 It looks more clean now. Remember the documentation. It writes only about 8-line (or, 8-page) screen. Not a word about 4-line screen. It looks like developers of the controller developed it for the 8-line screens only, but later, display developers, found out the solution how to employ it for the different types of scrrens.
