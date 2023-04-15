@@ -50,4 +50,3 @@ https://docs.espressif.com/projects/esp-docs/en/latest/introduction/restructured
 [Useful example of dealing with the OLED display I learned from. Sample code for driving 128x64 OLED display by Yanbe](https://github.com/yanbe/ssd1306-esp-idf-i2c)
 | cells | * paragraphs    |
 | too   |                 |
-+-------+-----------------+
