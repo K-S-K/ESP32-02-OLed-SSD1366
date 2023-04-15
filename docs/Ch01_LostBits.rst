@@ -45,7 +45,6 @@ https://gist.github.com/ionelmc/e876b73e2001acd2140f
 https://docs.espressif.com/projects/esp-docs/en/latest/introduction/restructuredtext-vs-markdown.html
 -->
 
-+---+-------+----------+
 | Useful links |
 | Sub   | Headings | Too  |
 +===+=======+==========+======+
