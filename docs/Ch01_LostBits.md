@@ -47,4 +47,4 @@ https://docs.espressif.com/projects/esp-docs/en/latest/introduction/restructured
 
 ## Useful links
 - [ESP32 manufacturer community forum about OLED display connections. Espressif forum brunch: OLED & Graphics Libraries](https://www.esp32.com/viewtopic.php?f=13&t=18656)<br>
-- [Useful example of dealing with the OLED display I learned from. Sample code for driving 128x64 OLED display by Yanbe](https://github.com/yanbe/ssd1306-esp-idf-i2c)
+- [Useful example made by Yanbe of dealing with the OLED display I learned from. Sample code for driving 128x64 OLED display](https://github.com/yanbe/ssd1306-esp-idf-i2c)
