@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "driver/gpio.h"
 
 #include "driver/i2c.h"
@@ -209,7 +208,7 @@ void ssd1306_init()
     i2c_cmd_link_delete(cmd);
 }
 
-void task_ssd1306_display_clear(void *ignore)
+void ssd1306_clear()
 {
     uint8_t zero[OLED_DISPLAY_WIDTH_PX];
     memset(zero, 0x00, sizeof(zero));
@@ -218,19 +217,16 @@ void task_ssd1306_display_clear(void *ignore)
     {
         draw_physical_page(line, zero);
     }
-
-    vTaskDelete(NULL);
 }
 
 /// @brief Display the given text according with the given description
-/// @param data The structure that contains line number, font reference and text to be displayed
-void task_ssd1306_display_text(void *data) // TODO guard against multiline text
+/// @param msg The structure that contains line number, font reference and text to be displayed
+void ssd1306_display_text(txtMsg msg) // TODO guard against multiline text
 {
-    txtDescr *txt = (txtDescr *)(data);
     bool enable_console_output = false;
-    int target_page = txt->line;
-    char *text = txt->text;
-    tFont font = txt->font;
+    int target_page = msg.line;
+    char *text = msg.text;
+    tFont font = msg.font;
     uint8_t font_size = 0;
     uint8_t font_width = 0;
     uint8_t font_height = 0;
@@ -254,7 +250,6 @@ void task_ssd1306_display_text(void *data) // TODO guard against multiline text
 
     default:
         printf("No such font while getting size and width&height: got %d\n", font);
-        vTaskDelete(NULL);
         return;
         break;
     }
@@ -301,7 +296,6 @@ void task_ssd1306_display_text(void *data) // TODO guard against multiline text
 
         default:
             printf("No such font while copying images from font: got %d\n", font);
-            vTaskDelete(NULL);
             return;
             break;
         }
@@ -363,6 +357,4 @@ void task_ssd1306_display_text(void *data) // TODO guard against multiline text
             }
         }
     }
-
-    vTaskDelete(NULL);
 }

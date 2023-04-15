@@ -16,15 +16,14 @@ typedef struct
 
     /// @brief The enumerated value that explains choosen font
     tFont font;
-} txtDescr;
+} txtMsg;
 
 /// @brief The ssd1306 device initialization
 void ssd1306_init();
 
 /// @brief Display the given text according with the given description
-/// @param data The structure that contains line number, font reference and text to be displayed
-void task_ssd1306_display_text(void *data);
+/// @param msg The structure that contains line number, font reference and text to be displayed
+void ssd1306_display_text(txtMsg msg);
 
 /// @brief Clear the whole screen to black
-/// @param ignore 
-void task_ssd1306_display_clear(void *ignore);
+void ssd1306_clear();
