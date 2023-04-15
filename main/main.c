@@ -44,8 +44,9 @@ void task_count(void *ignore)
 {
 	int i = 25463;
 
-	txtDescr txt16 = {1, "ABCDEFGH", F16x16};
-	xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt16, 6, NULL);
+	txtMsg txt16 = {1, "ABCDEFGH", F16x16};
+	// xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt16, 6, NULL);
+	ssd1306_display_text(txt16);
 
 	while (1)
 	{
@@ -54,19 +55,12 @@ void task_count(void *ignore)
 		char str[16];
 		sprintf(str, "%d: %d", pg, i);
 
-		txtDescr txt = {pg, str, F08x08};
-		// txtDescr txt = {0, "-", F08x08};
-		// txtDescr txt = {0, "+-", F16x16};
-		// txtDescr txt2 = {1, "ABCD", F16x16};
-		// txtDescr txt = {0, "A", F08x08};
-		// txtDescr txt1 = {0, "-", F16x16};
-		// txtDescr txt2 = {0, ",", F16x16};
-		// txtDescr txt = {2, "-", F16x16};
-		// txtDescr txt = {3, "-", F16x16};
+		txtMsg txt = {pg, str, F08x08};
+		// txtMsg txt = {0, "-", F08x08};
+		// txtMsg txt = {0, "+-", F16x16};
+		// txtMsg txt = {1, "ABCD", F16x16};
 
-		// xTaskCreate(&task_ssd1306_display_text, "display_text1", 2048, (void *)&txt1, 6, NULL);
-		// xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt2, 6, NULL);
-		xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt, 6, NULL);
+		ssd1306_display_text(txt);
 
 		vTaskDelay(50 / portTICK_PERIOD_MS);
 	}
@@ -93,8 +87,7 @@ void app_main(void)
 {
 	app_init();
 
-	xTaskCreate(task_ssd1306_display_clear, "clear", 2048, NULL, 6, NULL);
-	vTaskDelay(500 / portTICK_PERIOD_MS);
+	ssd1306_clear();
 
 	xTaskCreate(&task_blink, "blink", 2048, NULL, 6, NULL);
 	xTaskCreate(&task_count, "count", 2048, NULL, 6, NULL);
