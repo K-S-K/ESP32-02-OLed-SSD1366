@@ -1,3 +1,4 @@
+/// @brief The available fonts enumeration
 typedef enum
 {
     F08x08,
