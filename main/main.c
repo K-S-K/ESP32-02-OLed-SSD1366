@@ -99,7 +99,3 @@ void app_main(void)
 	xTaskCreate(&task_blink, "blink", 2048, NULL, 6, NULL);
 	xTaskCreate(&task_count, "count", 2048, NULL, 6, NULL);
 }
-
-// https://github.com/Moddable-OpenSource/moddable/issues/244
-// https://github.com/yanbe/ssd1306-esp-idf-i2c
-// https://www.esp32.com/viewtopic.php?t=18656
