@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef FONT08X08
 #define FONT08X08
 

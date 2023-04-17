@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef SSD1366DRV
+#define SSD1366DRV
+
 /// @brief The available fonts enumeration
 typedef enum
 {
@@ -27,3 +32,5 @@ void ssd1306_display_text(txtMsg msg);
 
 /// @brief Clear the whole screen to black
 void ssd1306_clear();
+
+#endif /* SSD1366DRV */
