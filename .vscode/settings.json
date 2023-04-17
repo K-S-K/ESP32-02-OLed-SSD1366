@@ -9,6 +9,8 @@
         "ssd1366.h": "c",
         "hardware_drv.c": "c",
         "ssd1366_drv.h": "c",
-        "hardware_drv.h": "c"
+        "hardware_drv.h": "c",
+        "times.c": "c",
+        "times.h": "c"
     }
 }
