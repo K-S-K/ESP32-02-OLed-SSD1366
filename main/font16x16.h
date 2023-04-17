@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef FONT16X16
 #define FONT16X16
 
