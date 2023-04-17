@@ -7,8 +7,6 @@
                 "C:/Espressif/frameworks/esp-idf-v5.0.1/components/**",
                 "C:/Espressif/frameworks/esp-idf-v5.0.1/components/freertos/esp_additions/include",
                 "C:/Espressif/frameworks/esp-idf-v5.0.1/components/freertos/FreeRTOS-Kernel/portable/linux/include",
-                "C:/Espressif/frameworks/esp-idf-v5.0.1/components/newlib/platform_include/sys",
-                "C:/Espressif/frameworks/esp-idf-v5.0.1/components/newlib/platform_include",
                 "C:/Espressif/frameworks/esp-idf-v5.0.1/components/freertos/FreeRTOS-Kernel/include/",
                 "C:/Espressif/frameworks/esp-idf-v5.0.1/components/log/include"
             ],

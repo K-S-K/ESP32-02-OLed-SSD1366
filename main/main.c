@@ -12,57 +12,22 @@
 #include "hardware_def.h"
 #include "hardware_drv.h"
 #include "ssd1366_drv.h"
+#include "times.h"
 
-int p = 0;
-
-void task_blink(void *ignore)
+void task_seconds(void *ignore)
 {
 	while (1)
 	{
 		// printf("Turning the LED on\n");
 		gpio_set_level(BLINK_GPIO, 1);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		vTaskDelay(100 / portTICK_PERIOD_MS);
 
 		// printf("Turning the LED off\n");
 		gpio_set_level(BLINK_GPIO, 0);
-		vTaskDelay(500 / portTICK_PERIOD_MS);
+		vTaskDelay(900 / portTICK_PERIOD_MS);
 
-		if (p == 3)
-		{
-			p = 0;
-		}
-		else
-		{
-			p += 3;
-		}
-	}
-
-	vTaskDelete(NULL);
-}
-
-void task_count(void *ignore)
-{
-	int i = 25463;
-
-	txtMsg txt16 = {1, "ABCDEFGH", F16x16};
-	// xTaskCreate(&task_ssd1306_display_text, "display_text2", 2048, (void *)&txt16, 6, NULL);
-	ssd1306_display_text(txt16);
-
-	while (1)
-	{
-		i++;
-		int pg = p;
-		char str[16];
-		sprintf(str, "%d: %d", pg, i);
-
-		txtMsg txt = {pg, str, F08x08};
-		// txtMsg txt = {0, "-", F08x08};
-		// txtMsg txt = {0, "+-", F16x16};
-		// txtMsg txt = {1, "ABCD", F16x16};
-
-		ssd1306_display_text(txt);
-
-		vTaskDelay(50 / portTICK_PERIOD_MS);
+		times_increment_second();
+		times_display();
 	}
 
 	vTaskDelete(NULL);
@@ -70,6 +35,8 @@ void task_count(void *ignore)
 
 void app_init(void)
 {
+	times_init();
+
 	i2c_master_init();
 	ssd1306_init();
 
@@ -89,6 +56,5 @@ void app_main(void)
 
 	ssd1306_clear();
 
-	xTaskCreate(&task_blink, "blink", 2048, NULL, 6, NULL);
-	xTaskCreate(&task_count, "count", 2048, NULL, 6, NULL);
+	xTaskCreate(&task_seconds, "seconds", 2048, NULL, 6, NULL);
 }
