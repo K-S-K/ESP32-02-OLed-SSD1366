@@ -26,11 +26,11 @@ That looks more understandable. Let's take a deeper look at the pixels.:<br>
 
 It looks cleaner now. Remember the documentation. It writes only about an 8-line (or 8-page) screen. Not a word about the 4-line screen. It seems like the controller developers developed it for the 8-line screens only, but later, display developers found out how to employ it for the different types of screens.
 
-The controller when works with a 4-line screen, connected to the even points only. It takes not every bit from the byte sent to it, but even ones. And the controller thinks he is still working with 8 line screen. Practically, why not.
+The controller when works with a 4-line screen, connected to the even points only. It takes not every bit from the byte sent to it, but even ones. And the controller thinks he is still working with 8 line screen.
 
 So, when we deal with a narrow display, we need to split every byte into even and not even bits and send one half-byte as a byte for the first line and the second half-byte to the second line. We must do it for every couple of screen's half lines, and every couple of half lines on the screen represents one whole display line. So, the controller thinks that it sends two lines to the 8-line screen, but actually, it sends two modified half-lines to the two half-lines of the screen. 
 
-That's how they use one type of controller for the two types of screens. Great decision, isn't it?
+That's how they use one type of controller for the two types of screens. Good practical decision, isn't it?
 
 Next step, we divide every byte of our 128-byte line of bits, imprinted there according to our input string and font, and, finally, we have a text on the screen that does not look crazy, but it looks exactly as we wanted.
 
