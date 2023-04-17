@@ -1,9 +1,10 @@
 # Printing the text on the Display
 
-Based on the ([display documentation.pdf](docs/SSD1306.pdf)) we have lines (named "pages") in the screen. Each "page" represented by line with 8 pixel height and 128 pixel width.
+Based on the ([display documentation.pdf](docs/SSD1306.pdf)) we have lines (named "pages") in the screen. Each "page" is represented by a bar with an 8-pixel height and 128-pixel width.
 
-We have a [font file](../main/font08x08.h) containing eight bytes for every symbol that our software can display on the screen. It looks like that's enough to prepare a bit array [128x8] bits, that is, an array with 128 bytes, filled with bytes in the places we want to see symbols. Looks good and is understandable. Let's fill the display with white points (just for fun) and then put two lines: " + - / . 0 " over them.
+We have a [font file](../main/font08x08.h) containing eight bytes for every symbol our software can display on the screen. That's enough to prepare a bit array [128x8] bits, that is, an array with 128 bytes, filled with bytes in the places we want to see symbols. Looks good and is understandable.
 
+Let's fill the display with white points (just for fun) and then put two lines: " + - / . 0 " over them.<br>
 ![Half - lines](Ch01_fig01_TwoLines.png)
 
 The result we received is far from expected.
@@ -21,7 +22,7 @@ Let's make another experiment. Try to print two lines:<br>
 "1234"<br>"ABCD":<br>
 ![Crazy lines](Ch01_fig03.png)
 
-That looks more understandable. Let's take a deeper look at the pixels.:<br>
+That looks more understandable now. Let's take a deeper look at the pixels.:<br>
 ![Crazy lines](Ch01_fig04.png)
 
 It looks cleaner now. Remember the documentation. It writes only about an 8-line (or 8-page) screen. Not a word about the 4-line screen. It seems like the controller developers developed it for the 8-line screens only, but later, display developers found out how to employ it for the different types of screens.
@@ -30,7 +31,7 @@ The controller when works with a 4-line screen, connected to the even points onl
 
 So, when we deal with a narrow display, we need to split every byte into even and not even bits and send one half-byte as a byte for the first line and the second half-byte to the second line. We must do it for every couple of screen's half lines, and every couple of half lines on the screen represents one whole display line. So, the controller thinks that it sends two lines to the 8-line screen, but actually, it sends two modified half-lines to the two half-lines of the screen. 
 
-That's how they use one type of controller for the two types of screens. Good practical decision, isn't it?
+That's how they use one type of controller for the two types of screens. It looks like a practical decision.
 
 Next step, we divide every byte of our 128-byte line of bits, imprinted there according to our input string and font, and, finally, we have a text on the screen that does not look crazy, but it looks exactly as we wanted.
 
