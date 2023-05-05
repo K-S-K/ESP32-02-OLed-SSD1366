@@ -16,4 +16,4 @@ This project communicates with the SSD1306 128x32 OLED Display ([pdf](docs/SSD13
 
 ![The device description.](docs/pinout.png)
 
-This project based on my previous project, [ESP32-01-LedBlink](https://github.com/K-S-K/ESP32-01-LedBlink)
+This project based on my previous project, [ESP32-01-LedBlink](https://github.com/K-S-K/ESP32-01-LedBlink), a classical hello-world MCU project.
