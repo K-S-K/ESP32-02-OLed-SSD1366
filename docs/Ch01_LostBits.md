@@ -4,7 +4,7 @@ Based on the ([display documentation.pdf](docs/SSD1306.pdf)) we have lines (name
 
 We have a [font file](../main/font08x08.h) containing eight bytes for every symbol our software can display on the screen. That's enough to prepare a bit array [128x8] bits, that is, an array with 128 bytes, filled with bytes in the places we want to see symbols. Looks good and is understandable.
 
-Let's fill the display with white points (just for fun) and then put two lines: " + - / . 0 " over them.<br>
+Let's fill the display with white points (just for fun) and then put two lines: " + - . / 0 " over them.<br>
 ![Half - lines](Ch01_fig01_TwoLines.png)
 
 The result we received is far from expected.
